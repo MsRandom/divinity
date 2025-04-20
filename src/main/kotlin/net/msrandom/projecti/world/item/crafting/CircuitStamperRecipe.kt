@@ -13,14 +13,14 @@ import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.Level
 
-class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, val result: ItemStack) : Recipe<CraftingInput> {
+class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, private val result: ItemStack) : Recipe<CraftingInput> {
     constructor(
-        ingredient1: Ingredient,
-        ingredient2: Ingredient,
-        ingredient3: Ingredient,
-        ingredient4: Ingredient,
+        topLeftIngredient: Ingredient,
+        topRightIngredient: Ingredient,
+        bottomLeftIngredient: Ingredient,
+        bottomRightIngredient: Ingredient,
         result: ItemStack,
-    ): this(NonNullList.of(Ingredient.EMPTY, ingredient1, ingredient2, ingredient3, ingredient4), result)
+    ): this(NonNullList.of(Ingredient.EMPTY, topLeftIngredient, topRightIngredient, bottomLeftIngredient, bottomRightIngredient), result)
 
     override fun matches(
         input: CraftingInput,
@@ -36,8 +36,14 @@ class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, val
     override fun getSerializer() = ProjectIRecipeSerializers.circuitStamper
     override fun getType() = ProjectIRecipeTypes.circuitStamper
 
+    override fun isIncomplete(): Boolean {
+        val ingredients = ingredients
+
+        return ingredients.isEmpty() || ingredients.filterNot(Ingredient::isEmpty).any(Ingredient::hasNoItems)
+    }
+
     companion object {
-        private val INGREDIENTS_CODEC = Ingredient.CODEC_NONEMPTY.listOf().flatXmap({
+        private val INGREDIENTS_CODEC = Ingredient.CODEC.listOf().flatXmap({
             if (it.size != 4) {
                 DataResult.error { "Incorrect input ingredient size, required is 4 but got ${it.size}" }
             } else {

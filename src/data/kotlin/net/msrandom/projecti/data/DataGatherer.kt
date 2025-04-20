@@ -12,6 +12,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent
 fun gatherData(event: GatherDataEvent) {
     event.createProvider(::MeltingDataMapProvider)
     event.createProvider(::SoulTypeDataMapProvider)
+    event.createProvider(::CircuitStamperRecipeProvider)
 
     event.addProvider(ProjectITagProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
 }

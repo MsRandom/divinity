@@ -1,6 +1,5 @@
 package net.msrandom.projecti.world.level.melting
 
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.DamageTypeTags
 import net.minecraft.world.entity.Entity.RemovalReason
 import net.minecraft.world.entity.item.ItemEntity
