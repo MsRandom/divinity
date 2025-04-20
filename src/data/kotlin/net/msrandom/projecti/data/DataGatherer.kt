@@ -10,6 +10,6 @@ import net.neoforged.neoforge.data.event.GatherDataEvent
 @Suppress("unused")
 @SubscribeEvent
 fun gatherData(event: GatherDataEvent) {
-    event.createProvider(::MeltableDataMapProvider)
+    event.createProvider(::MeltingDataMapProvider)
     event.addProvider(ProjectITagProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
 }

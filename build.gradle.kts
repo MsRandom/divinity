@@ -1,5 +1,5 @@
 plugins {
-    id("earth.terrarium.cloche") version "0.9.5"
+    id("earth.terrarium.cloche") version "0.9.6"
     kotlin("jvm") version "2.1.0"
 }
 

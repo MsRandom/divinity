@@ -13,7 +13,7 @@ import net.msrandom.projecti.world.level.melting.MeltingData
 import net.neoforged.neoforge.common.data.DataMapProvider
 import java.util.concurrent.CompletableFuture
 
-class MeltableDataMapProvider(
+class MeltingDataMapProvider(
     packOutput: PackOutput,
     lookupProvider: CompletableFuture<HolderLookup.Provider>,
 ) : DataMapProvider(packOutput, lookupProvider) {
@@ -26,6 +26,6 @@ class MeltableDataMapProvider(
 
         addMeltable(ProjectIBlocks.blueCrystal.asItem(), MeltingData(ProjectIFluids.moltenBlueCrystal))
         addMeltable(ProjectIItems.yellowCrystal, MeltingData(ProjectIFluids.moltenYellowCrystal))
-        addMeltable(Items.GLASS, MeltingData(ProjectIFluids.moltenGlass, 5 * 60 * TICKS_PER_SECOND))
+        addMeltable(Items.GLASS, MeltingData(ProjectIFluids.moltenGlass))
     }
 }
