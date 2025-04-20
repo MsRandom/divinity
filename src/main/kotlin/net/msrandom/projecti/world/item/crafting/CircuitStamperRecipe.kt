@@ -13,7 +13,7 @@ import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.Level
 
-class CircuitStamperRecipe(val ingredients: NonNullList<Ingredient>, val result: ItemStack) : Recipe<CraftingInput> {
+class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, val result: ItemStack) : Recipe<CraftingInput> {
     constructor(
         ingredient1: Ingredient,
         ingredient2: Ingredient,
@@ -28,9 +28,11 @@ class CircuitStamperRecipe(val ingredients: NonNullList<Ingredient>, val result:
     ) = ingredients.withIndex().all { (index, ingredient) -> ingredient.test(input.getItem(index)) }
 
     override fun assemble(input: CraftingInput, registries: HolderLookup.Provider): ItemStack = result.copy()
-
     override fun canCraftInDimensions(width: Int, height: Int) = width == 2 && height == 2
     override fun getResultItem(registries: HolderLookup.Provider) = result
+    override fun getIngredients() = ingredients
+    override fun isSpecial() = true
+    override fun getToastSymbol() = result
     override fun getSerializer() = ProjectIRecipeSerializers.circuitStamper
     override fun getType() = ProjectIRecipeTypes.circuitStamper
 
@@ -43,6 +45,7 @@ class CircuitStamperRecipe(val ingredients: NonNullList<Ingredient>, val result:
             }
         }, DataResult<List<Ingredient>>::success)
 
+        @JvmField
         val CODEC: MapCodec<CircuitStamperRecipe> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
                 INGREDIENTS_CODEC.fieldOf("ingredients").forGetter(CircuitStamperRecipe::ingredients),

@@ -1,5 +1,5 @@
 plugins {
-    id("earth.terrarium.cloche") version "0.9.4"
+    id("earth.terrarium.cloche") version "0.9.5"
     kotlin("jvm") version "2.1.0"
 }
 
@@ -27,6 +27,8 @@ cloche {
     singleTarget {
         neoforge {
             loaderVersion = "21.1.153"
+
+            mixins.from("project_i.mixins.json")
 
             data()
             test()
