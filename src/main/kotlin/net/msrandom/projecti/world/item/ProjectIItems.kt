@@ -16,6 +16,7 @@ object ProjectIItems : Registrar<Item> {
 
     val yellowCrystal: Item by register.registerSimpleItem("yellow_crystal")
     val knowledgeGem: Item by register.registerSimpleItem("knowledge_gem")
+    val soulbone: Item by register.registerSimpleItem("soulbone")
 
     init {
         tabRegister.register("main") { ->

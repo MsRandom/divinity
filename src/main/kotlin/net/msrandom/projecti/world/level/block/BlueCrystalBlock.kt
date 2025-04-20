@@ -2,6 +2,7 @@ package net.msrandom.projecti.world.level.block
 
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.EntityBlock
@@ -9,13 +10,19 @@ import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.AttachFace
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.msrandom.projecti.world.level.block.entity.BlueCrystalBlockEntity
 
 class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirectionalBlock(properties), EntityBlock {
     init {
-        registerDefaultState(defaultBlockState().setValue(AGE, 0))
+        registerDefaultState(
+            defaultBlockState()
+                .setValue(AGE, 0)
+                .setValue(FACING, Direction.NORTH)
+                .setValue(FACE, AttachFace.FLOOR),
+        )
     }
 
     override fun getRenderShape(state: BlockState) = RenderShape.INVISIBLE
@@ -27,11 +34,10 @@ class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirection
     }
 
     override fun codec(): MapCodec<BlueCrystalBlock> = simpleCodec(::BlueCrystalBlock)
-
     override fun newBlockEntity(pos: BlockPos, state: BlockState) = BlueCrystalBlockEntity(pos, state)
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
-        builder.add(AGE)
+        builder.add(AGE, FACE, FACING)
     }
 
     companion object {

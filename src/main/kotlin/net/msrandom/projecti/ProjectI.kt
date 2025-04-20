@@ -9,6 +9,8 @@ import net.msrandom.projecti.world.level.block.entity.ProjectIBlockEntities
 import net.msrandom.projecti.world.level.fluid.ProjectIFluids
 import net.msrandom.projecti.world.level.melting.MeltEventHandler
 import net.msrandom.projecti.world.level.melting.MeltingData
+import net.msrandom.projecti.world.level.soul.SoulEventHandler
+import net.msrandom.projecti.world.level.soul.SoulType
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.common.NeoForge
@@ -36,10 +38,13 @@ class ProjectI(modBus: IEventBus) {
         }
 
         modBus.addListener(::registerDataMapTypes)
+
+        NeoForge.EVENT_BUS.register(SoulEventHandler)
         NeoForge.EVENT_BUS.register(MeltEventHandler)
     }
 
     private fun registerDataMapTypes(event: RegisterDataMapTypesEvent) {
+        event.register(SoulType.DATA_MAP)
         event.register(MeltingData.DATA_MAP)
     }
 

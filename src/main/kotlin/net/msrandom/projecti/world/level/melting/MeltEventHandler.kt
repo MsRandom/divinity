@@ -10,11 +10,7 @@ import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.event.entity.EntityInvulnerabilityCheckEvent
 
 object MeltEventHandler {
-    private fun getMeltData(entity: ItemEntity): MeltingData? {
-        val holder = BuiltInRegistries.ITEM.getHolder(BuiltInRegistries.ITEM.getKey(entity.item.item)).orElseThrow()
-
-        return holder.getData(MeltingData.DATA_MAP)
-    }
+    private fun getMeltData(entity: ItemEntity) = entity.item.itemHolder.getData(MeltingData.DATA_MAP)
 
     @Suppress("unused")
     @SubscribeEvent(priority = EventPriority.HIGH)

@@ -11,5 +11,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent
 @SubscribeEvent
 fun gatherData(event: GatherDataEvent) {
     event.createProvider(::MeltingDataMapProvider)
+    event.createProvider(::SoulTypeDataMapProvider)
+
     event.addProvider(ProjectITagProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
 }

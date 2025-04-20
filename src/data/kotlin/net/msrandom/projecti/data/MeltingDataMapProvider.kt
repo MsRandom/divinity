@@ -1,6 +1,5 @@
 package net.msrandom.projecti.data
 
-import net.minecraft.SharedConstants.TICKS_PER_SECOND
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.PackOutput
@@ -17,6 +16,8 @@ class MeltingDataMapProvider(
     packOutput: PackOutput,
     lookupProvider: CompletableFuture<HolderLookup.Provider>,
 ) : DataMapProvider(packOutput, lookupProvider) {
+    override fun getName() = "Melting Data Map"
+
     override fun gather(provider: HolderLookup.Provider) {
         val meltingData = builder(MeltingData.DATA_MAP)
 
