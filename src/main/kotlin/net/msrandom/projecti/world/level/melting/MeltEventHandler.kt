@@ -1,12 +1,25 @@
 package net.msrandom.projecti.world.level.melting
 
+import net.minecraft.core.BlockPos
 import net.minecraft.tags.DamageTypeTags
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.Entity.RemovalReason
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Block
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.event.entity.EntityInvulnerabilityCheckEvent
+import net.neoforged.neoforge.fluids.FluidType
+
+inline fun Entity.forEachFluidType(crossinline action: (fluidType: FluidType) -> Unit) {
+    // No other way to iterate through containing fluid types, so
+    isInFluidType { fluidType, _ ->
+        action(fluidType)
+
+        // Keep iterating regardless so we get the hottest fluid
+        false
+    }
+}
 
 object MeltEventHandler {
     private fun getMeltData(entity: ItemEntity) = entity.item.itemHolder.getData(MeltingData.DATA_MAP)
@@ -28,31 +41,45 @@ object MeltEventHandler {
 
     fun handleItemTick(itemEntity: ItemEntity) {
         val level = itemEntity.level()
-        val pos = itemEntity.blockPosition()
-        val containingFluid = level.getFluidState(pos)
 
-        if (containingFluid.isEmpty) {
+        if (!itemEntity.isInFluidType) {
             // Not in fluid, can not be melting
-
             return
         }
 
         val meltingData = getMeltData(itemEntity) ?: return
 
-        if (meltingData.moltenFluid.fluidType.temperature >= containingFluid.fluidType.temperature) {
-            // Temperature of the molten form of this item is higher than the fluid it is currently submerged in, thus it is not melting
+        var hottestFluidType: FluidType? = null
+
+        itemEntity.forEachFluidType {
+            if (meltingData.moltenFluid.fluidType.temperature >= it.temperature) {
+                // Molten fluid form of item is hotter than this fluid containing it, thus we can skip it as it is not hot enough
+                return@forEachFluidType
+            }
+
+            if (hottestFluidType == null || it.temperature > hottestFluidType!!.temperature) {
+                hottestFluidType = it
+            }
+        }
+
+        if (hottestFluidType == null) {
+            // The item is not in any fluid hot enough to melt it
             return
         }
 
         if (!level.isClientSide && itemEntity.age > meltingData.meltTicks) {
             // Item has lasted long enough to melt
+            val pos = BlockPos.containing(itemEntity.x, itemEntity.y + itemEntity.getFluidTypeHeight(hottestFluidType), itemEntity.z)
+
             itemEntity.remove(RemovalReason.DISCARDED)
+
             level.setBlock(pos, meltingData.moltenFluid.defaultFluidState().createLegacyBlock(), Block.UPDATE_NEIGHBORS or Block.UPDATE_CLIENTS)
 
             return
         }
 
         if (itemEntity.deltaMovement.y > 0.0) {
+            // Stop item from floating
             itemEntity.setDeltaMovement(itemEntity.deltaMovement.x, 0.0, itemEntity.deltaMovement.z)
         }
 
