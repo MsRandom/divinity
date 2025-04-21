@@ -14,5 +14,6 @@ fun gatherData(event: GatherDataEvent) {
     event.createProvider(::SoulTypeDataMapProvider)
     event.createProvider(::CircuitStamperRecipeProvider)
 
-    event.addProvider(ProjectITagProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
+    event.addProvider(ProjectIBlockTagsProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
+    event.addProvider(ProjectIFluidTagsProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
 }

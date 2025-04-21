@@ -8,12 +8,12 @@ import net.minecraft.core.NonNullList
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.crafting.CraftingInput
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.level.Level
 
-class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, private val result: ItemStack) : Recipe<CraftingInput> {
+class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, private val result: ItemStack) : Recipe<RecipeInput> {
     constructor(
         topLeftIngredient: Ingredient,
         topRightIngredient: Ingredient,
@@ -23,11 +23,11 @@ class CircuitStamperRecipe(private val ingredients: NonNullList<Ingredient>, pri
     ): this(NonNullList.of(Ingredient.EMPTY, topLeftIngredient, topRightIngredient, bottomLeftIngredient, bottomRightIngredient), result)
 
     override fun matches(
-        input: CraftingInput,
+        input: RecipeInput,
         level: Level,
     ) = ingredients.withIndex().all { (index, ingredient) -> ingredient.test(input.getItem(index)) }
 
-    override fun assemble(input: CraftingInput, registries: HolderLookup.Provider): ItemStack = result.copy()
+    override fun assemble(input: RecipeInput, registries: HolderLookup.Provider): ItemStack = result.copy()
     override fun canCraftInDimensions(width: Int, height: Int) = width == 2 && height == 2
     override fun getResultItem(registries: HolderLookup.Provider) = result
     override fun getIngredients() = ingredients
