@@ -77,6 +77,12 @@ class CircuitStamperBlock(properties: Properties) : HorizontalDirectionalBlock(p
         }
     }
 
+    override fun triggerEvent(state: BlockState, level: Level, pos: BlockPos, id: Int, param: Int): Boolean {
+        super.triggerEvent(state, level, pos, id, param)
+
+        return level.getBlockEntity(pos)?.triggerEvent(id, param) == true
+    }
+
     override fun rotate(state: BlockState, rot: Rotation): BlockState =
         state.setValue(FACING, rot.rotate(state.getValue(FACING)))
 
