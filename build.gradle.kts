@@ -14,8 +14,8 @@ repositories {
 
 cloche {
     metadata {
-        modId = "project_i"
-        name = "Project I"
+        modId = "divinity"
+        name = "Divinity"
 
         description = "Music for the soul"
 
@@ -28,7 +28,7 @@ cloche {
         neoforge {
             loaderVersion = "21.1.153"
 
-            mixins.from("project_i.mixins.json")
+            mixins.from("divinity.mixins.json")
 
             data()
             test()

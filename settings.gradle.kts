@@ -1,4 +1,4 @@
-rootProject.name = "project-i"
+rootProject.name = "divinity"
 
 pluginManagement {
     repositories {

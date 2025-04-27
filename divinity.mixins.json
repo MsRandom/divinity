@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "package": "net.msrandom.divinity.mixin",
+  "mixins": [
+    "ItemEntityMeltingMixin"
+  ]
+}
