@@ -22,7 +22,7 @@ import net.msrandom.divinity.world.level.block.entity.DivinityBlockEntities
 
 class CircuitStamperBlock(properties: Properties) : HorizontalDirectionalBlock(properties), EntityBlock {
     init {
-        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(FACING, Direction.NORTH))
+        registerDefaultState(stateDefinition.any().setValue(POWERED, false).setValue(FACING, Direction.NORTH))
     }
 
     override fun getRenderShape(state: BlockState) = RenderShape.ENTITYBLOCK_ANIMATED

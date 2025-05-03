@@ -8,17 +8,14 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemUtils
 import net.minecraft.world.item.Items
 import net.msrandom.divinity.world.item.DivinityItems
-import net.neoforged.bus.api.EventPriority
-import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
 
 object SoulEventHandler {
     // TODO Needs special handling for hollow golems and entities with no souls
     private fun isSoulPresent(entity: LivingEntity): Boolean =
         // Ignore baby villagers
-        entity is Player || entity !is Villager || entity.isBaby
+        entity is Player || entity !is Villager || !entity.isBaby
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun dropSoulBone(event: LivingDeathEvent) {
         val entity = event.entity
 

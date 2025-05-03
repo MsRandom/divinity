@@ -1,5 +1,5 @@
 plugins {
-    id("earth.terrarium.cloche") version "0.9.6"
+    id("earth.terrarium.cloche") version "0.9.9"
     kotlin("jvm") version "2.1.0"
 }
 
@@ -8,8 +8,10 @@ repositories {
 
     mavenCentral()
 
-    maven(url = "https://maven.neoforged.net/mojang-meta")
-    cloche.mavenNeoforged()
+    cloche {
+        mavenNeoforgedMeta()
+        mavenNeoforged()
+    }
 }
 
 cloche {

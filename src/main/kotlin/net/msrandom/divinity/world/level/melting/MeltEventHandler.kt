@@ -2,15 +2,17 @@ package net.msrandom.divinity.world.level.melting
 
 import net.minecraft.core.BlockPos
 import net.minecraft.tags.DamageTypeTags
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.Entity.RemovalReason
 import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.level.block.Block
 import net.msrandom.divinity.world.level.melting.MeltingData.MELTING_TICK_FACTOR
-import net.neoforged.bus.api.EventPriority
-import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.event.entity.EntityInvulnerabilityCheckEvent
+import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.FluidType
+import net.neoforged.neoforge.fluids.FluidUtil
+import net.neoforged.neoforge.fluids.capability.IFluidHandler
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank
 
 inline fun Entity.forEachFluidType(crossinline action: (fluidType: FluidType) -> Unit) {
     // No other way to iterate through containing fluid types, so
@@ -25,8 +27,6 @@ inline fun Entity.forEachFluidType(crossinline action: (fluidType: FluidType) ->
 object MeltEventHandler {
     private fun getMoltenForm(entity: ItemEntity) = entity.item.itemHolder.getData(MeltingData.DATA_MAP)
 
-    @Suppress("unused")
-    @SubscribeEvent(priority = EventPriority.HIGH)
     fun checkEntityInvulnerability(event: EntityInvulnerabilityCheckEvent) {
         val entity = event.entity
 
@@ -77,7 +77,12 @@ object MeltEventHandler {
 
             itemEntity.remove(RemovalReason.DISCARDED)
 
-            level.setBlock(pos, moltenFluid.defaultFluidState().createLegacyBlock(), Block.UPDATE_NEIGHBORS or Block.UPDATE_CLIENTS)
+            val tank = FluidTank(FluidType.BUCKET_VOLUME)
+            val stack = FluidStack(moltenFluid, FluidType.BUCKET_VOLUME)
+
+            tank.fill(stack, IFluidHandler.FluidAction.EXECUTE)
+
+            FluidUtil.tryPlaceFluid(null, level, InteractionHand.MAIN_HAND, pos, tank, stack)
 
             return
         }

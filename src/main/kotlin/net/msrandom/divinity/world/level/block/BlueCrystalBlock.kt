@@ -22,7 +22,7 @@ import net.neoforged.neoforge.common.Tags
 class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirectionalBlock(properties), EntityBlock {
     init {
         registerDefaultState(
-            defaultBlockState()
+            stateDefinition.any()
                 .setValue(AGE, 0)
                 .setValue(FACING, Direction.NORTH)
                 .setValue(FACE, AttachFace.FLOOR),

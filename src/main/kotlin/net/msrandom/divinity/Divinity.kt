@@ -11,6 +11,7 @@ import net.msrandom.divinity.world.level.melting.MeltEventHandler
 import net.msrandom.divinity.world.level.melting.MeltingData
 import net.msrandom.divinity.world.level.soul.SoulEventHandler
 import net.msrandom.divinity.world.level.soul.SoulType
+import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.common.NeoForge
@@ -38,9 +39,10 @@ class Divinity(modBus: IEventBus) {
         }
 
         modBus.addListener(::registerDataMapTypes)
+        modBus.addListener(DivinityFluids::registerFluidInteractions)
 
-        NeoForge.EVENT_BUS.register(SoulEventHandler)
-        NeoForge.EVENT_BUS.register(MeltEventHandler)
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, SoulEventHandler::dropSoulBone)
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, MeltEventHandler::checkEntityInvulnerability)
     }
 
     private fun registerDataMapTypes(event: RegisterDataMapTypesEvent) {

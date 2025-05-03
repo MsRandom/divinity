@@ -1,11 +1,15 @@
 package net.msrandom.divinity.world.level.fluid
 
+import net.minecraft.core.Direction
 import net.minecraft.core.registries.Registries
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.item.BucketItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LiquidBlock
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.material.FlowingFluid
 import net.minecraft.world.level.material.Fluid
 import net.minecraft.world.level.pathfinder.PathType
@@ -14,8 +18,11 @@ import net.msrandom.divinity.getValue
 import net.msrandom.divinity.world.Registrar
 import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.level.block.DivinityBlocks
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
+import net.neoforged.neoforge.common.NeoForgeMod
 import net.neoforged.neoforge.common.SoundActions
 import net.neoforged.neoforge.fluids.BaseFlowingFluid
+import net.neoforged.neoforge.fluids.FluidInteractionRegistry
 import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -28,11 +35,32 @@ object DivinityFluids : Registrar<Fluid> {
     val fluidTypeRegister: DeferredRegister<FluidType> =
         DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, Divinity.MOD_ID)
 
-    val moltenBlueCrystal: FlowingFluid by register("molten_blue_crystal", DivinityBlocks::moltenBlueCrystal)
-    val moltenYellowCrystal: FlowingFluid by register("molten_yellow_crystal", DivinityBlocks::moltenYellowCrystal)
-    val moltenGlass: FlowingFluid by register("molten_glass", DivinityBlocks::moltenGlass)
+    private val interactionHandlers =
+        mutableListOf<Pair<DeferredHolder<FluidType, FluidType>, FluidInteractionRegistry.InteractionInformation>>()
 
-    private fun register(name: String, liquidBlock: () -> LiquidBlock): DeferredHolder<Fluid, BaseFlowingFluid.Source> {
+    val moltenBlueCrystal: FlowingFluid by register(
+        "molten_blue_crystal",
+        DivinityBlocks::moltenBlueCrystal,
+        DivinityBlocks::blueCrystal
+    )
+    val moltenYellowCrystal: FlowingFluid by register(
+        "molten_yellow_crystal",
+        DivinityBlocks::moltenYellowCrystal,
+        DivinityBlocks::blueCrystal
+    )
+    val moltenGlass: FlowingFluid by register("molten_glass", DivinityBlocks::moltenGlass, Blocks::GLASS)
+
+    internal fun registerFluidInteractions(@Suppress("unused") event: FMLCommonSetupEvent) {
+        for ((fluidType, interaction) in interactionHandlers) {
+            FluidInteractionRegistry.addInteraction(fluidType.get(), interaction)
+        }
+    }
+
+    private fun register(
+        name: String,
+        liquidBlock: () -> LiquidBlock,
+        solidForm: () -> Block,
+    ): DeferredHolder<Fluid, MoltenFluid.Source> {
         val fluidType = fluidTypeRegister.register(name) { ->
             FluidType(
                 FluidType.Properties
@@ -42,7 +70,7 @@ object DivinityFluids : Registrar<Fluid> {
                     .canDrown(false)
                     .pathType(PathType.LAVA)
                     .adjacentPathType(null)
-                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA) // TODO Should be custom sound events
                     .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
                     .lightLevel(10)
                     .density(3000)
@@ -51,20 +79,43 @@ object DivinityFluids : Registrar<Fluid> {
             )
         }
 
+        val interaction = FluidInteractionRegistry.InteractionInformation(
+            { level, currentPos, relativePos, state ->
+                state.isSource && level.getFluidState(relativePos).fluidType == NeoForgeMod.WATER_TYPE.value()
+            },
+            { level, currentPos, relativePos, state ->
+                val block = solidForm()
+
+                if (BlockStateProperties.HORIZONTAL_FACING in block.stateDefinition.properties) {
+                    block.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.from2DDataValue(relativePos.asLong().toInt()))
+                } else {
+                    block.defaultBlockState()
+                }
+            },
+        )
+
+        interactionHandlers.add(fluidType to interaction)
+
         val fluid = object {
-            val source: DeferredHolder<Fluid, BaseFlowingFluid.Source> = register.register(name) { ->
-                BaseFlowingFluid.Source(fluidProperties)
+            val source: DeferredHolder<Fluid, MoltenFluid.Source> = register.register(name) { ->
+                MoltenFluid.Source(fluidProperties)
             }
 
-            val flowing: DeferredHolder<Fluid, BaseFlowingFluid.Flowing> = register.register("flowing_$name") { ->
-                BaseFlowingFluid.Flowing(fluidProperties)
+            val flowing: DeferredHolder<Fluid, MoltenFluid.Flowing> = register.register("flowing_$name") { ->
+                MoltenFluid.Flowing(fluidProperties)
             }
 
             val bucket: DeferredHolder<Item, BucketItem> = DivinityItems.register.registerItem("${name}_bucket", {
                 BucketItem(source.get(), it)
             }, Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1))
 
-            val fluidProperties = BaseFlowingFluid.Properties(fluidType, source, flowing).block(liquidBlock).bucket(bucket)
+            val fluidProperties = BaseFlowingFluid.Properties(fluidType, source, flowing)
+                .block(liquidBlock)
+                .bucket(bucket)
+                .explosionResistance(100f)
+                .tickRate(40)
+                .slopeFindDistance(1)
+                .levelDecreasePerBlock(2)
         }.source
 
         return fluid
