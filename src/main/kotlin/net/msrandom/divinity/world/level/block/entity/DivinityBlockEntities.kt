@@ -8,8 +8,9 @@ import net.msrandom.divinity.world.Registrar
 import net.msrandom.divinity.world.level.block.DivinityBlocks
 import net.neoforged.neoforge.registries.DeferredRegister
 
-object DivinityBlockEntities : Registrar<BlockEntityType<*>> {
-    override val register: DeferredRegister<BlockEntityType<*>> = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Divinity.MOD_ID)
+object DivinityBlockEntities : Registrar<DeferredRegister<BlockEntityType<*>>> {
+    override val register: DeferredRegister<BlockEntityType<*>> =
+        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Divinity.MOD_ID)
 
     val blueCrystal: BlockEntityType<BlueCrystalBlockEntity> by register.register("blue_crystal") { ->
         BlockEntityType(::BlueCrystalBlockEntity, setOf(DivinityBlocks.blueCrystal), null)
@@ -21,5 +22,9 @@ object DivinityBlockEntities : Registrar<BlockEntityType<*>> {
 
     val bellows: BlockEntityType<BellowsBlockEntity> by register.register("bellows") { ->
         BlockEntityType(::BellowsBlockEntity, setOf(DivinityBlocks.bellows), null)
+    }
+
+    val blowMold: BlockEntityType<BlowMoldBlockEntity> by register.register("blow_mold") { ->
+        BlockEntityType(::BlowMoldBlockEntity, setOf(DivinityBlocks.blowMold), null)
     }
 }

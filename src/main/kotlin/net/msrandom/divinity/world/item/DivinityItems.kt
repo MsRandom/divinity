@@ -13,7 +13,14 @@ import net.neoforged.neoforge.registries.DeferredRegister
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.reflect.KProperty
 
-object DivinityItems : Registrar<Item> {
+internal fun Registrar<DeferredRegister.Items>.simpleItem() = object : PropertyDelegateProvider<Any?, DeferredItem<Item>> {
+    override fun provideDelegate(
+        thisRef: Any?,
+        property: KProperty<*>,
+    ) = register.registerSimpleItem(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, property.name))
+}
+
+object DivinityItems : Registrar<DeferredRegister.Items> {
     override val register: DeferredRegister.Items = DeferredRegister.createItems(Divinity.MOD_ID)
 
     val tabRegister: DeferredRegister<CreativeModeTab> =
@@ -45,12 +52,5 @@ object DivinityItems : Registrar<Item> {
                     }
                 }.build()
         }
-    }
-
-    private fun simpleItem() = object : PropertyDelegateProvider<Any?, DeferredItem<Item>> {
-        override fun provideDelegate(
-            thisRef: Any?,
-            property: KProperty<*>,
-        ) = register.registerSimpleItem(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, property.name))
     }
 }

@@ -12,7 +12,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent
 fun gatherData(event: GatherDataEvent) {
     event.createProvider(::MeltingDataMapProvider)
     event.createProvider(::SoulTypeDataMapProvider)
-    event.createProvider(::CircuitStamperRecipeProvider)
+    event.createProvider(::DivinityRecipeProvider)
 
     event.addProvider(DivinityBlockTagsProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))
     event.addProvider(DivinityFluidTagsProvider(event.generator.packOutput, event.lookupProvider, event.existingFileHelper))

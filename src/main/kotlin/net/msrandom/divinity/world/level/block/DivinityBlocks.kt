@@ -18,13 +18,14 @@ import net.msrandom.divinity.world.level.fluid.DivinityFluids
 import net.neoforged.neoforge.registries.DeferredBlock
 import net.neoforged.neoforge.registries.DeferredRegister
 
-object DivinityBlocks : Registrar<Block> {
+object DivinityBlocks : Registrar<DeferredRegister.Blocks> {
     override val register: DeferredRegister.Blocks = DeferredRegister.createBlocks(Divinity.MOD_ID)
 
     val blueCrystal: BlueCrystalBlock by blockWithItem("blue_crystal", ::BlueCrystalBlock, itemFactory = ::BlueCrystalItem)
 
     val circuitStamper: CircuitStamperBlock by blockWithItem("circuit_stamper", ::CircuitStamperBlock)
     val bellows: BellowsBlock by blockWithItem("bellows", ::BellowsBlock)
+    val blowMold: BlowMoldBlock by blockWithItem("blow_mold", ::BlowMoldBlock)
 
     val moltenBlueCrystal: LiquidBlock by moltenFluidBlock("molten_blue_crystal", DivinityFluids::moltenBlueCrystal)
     val moltenYellowCrystal: LiquidBlock by moltenFluidBlock("molten_yellow_crystal", DivinityFluids::moltenYellowCrystal)
