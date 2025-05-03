@@ -19,143 +19,169 @@ import net.neoforged.neoforge.event.EventHooks
 import net.neoforged.neoforge.fluids.BaseFlowingFluid
 
 abstract class MoltenFluid protected constructor(properties: Properties) : BaseFlowingFluid(properties) {
-    public override fun animateTick(level: Level, pos: BlockPos, state: FluidState?, random: RandomSource?) {
-        val blockpos = pos.above()
-        if (level.getBlockState(blockpos).isAir() && !level.getBlockState(blockpos).isSolidRender(level, blockpos)) {
-            if (random!!.nextInt(100) == 0) {
-                val d0 = pos.getX().toDouble() + random.nextDouble()
-                val d1 = pos.getY().toDouble() + 1.0
-                val d2 = pos.getZ().toDouble() + random.nextDouble()
-                level.addParticle(ParticleTypes.LAVA, d0, d1, d2, 0.0, 0.0, 0.0)
-                level.playLocalSound(
-                    d0,
-                    d1,
-                    d2,
-                    SoundEvents.LAVA_POP,
-                    SoundSource.BLOCKS,
-                    0.2f + random.nextFloat() * 0.2f,
-                    0.9f + random.nextFloat() * 0.15f,
-                    false
-                )
-            }
+    // Copied from vanilla to do lava-like particles
+    public override fun animateTick(level: Level, pos: BlockPos, state: FluidState, random: RandomSource) {
+        val above = pos.above()
 
-            if (random.nextInt(200) == 0) {
-                level.playLocalSound(
-                    pos.getX().toDouble(),
-                    pos.getY().toDouble(),
-                    pos.getZ().toDouble(),
-                    SoundEvents.LAVA_AMBIENT,
-                    SoundSource.BLOCKS,
-                    0.2f + random.nextFloat() * 0.2f,
-                    0.9f + random.nextFloat() * 0.15f,
-                    false
-                )
-            }
+        if (!level.getBlockState(above).isAir || level.getBlockState(above).isSolidRender(level, above)) {
+            return
         }
+
+        if (random.nextInt(100) == 0) {
+            val d0 = pos.x.toDouble() + random.nextDouble()
+            val d1 = pos.y.toDouble() + 1.0
+            val d2 = pos.z.toDouble() + random.nextDouble()
+
+            // TODO New particles
+            level.addParticle(ParticleTypes.LAVA, d0, d1, d2, 0.0, 0.0, 0.0)
+
+            // TODO New sound events
+            level.playLocalSound(
+                d0,
+                d1,
+                d2,
+                SoundEvents.LAVA_POP,
+                SoundSource.BLOCKS,
+                0.2f + random.nextFloat() * 0.2f,
+                0.9f + random.nextFloat() * 0.15f,
+                false,
+            )
+        }
+
+        if (random.nextInt(200) != 0) {
+            return
+        }
+
+        level.playLocalSound(
+            pos.x.toDouble(),
+            pos.y.toDouble(),
+            pos.z.toDouble(),
+            SoundEvents.LAVA_AMBIENT,
+            SoundSource.BLOCKS,
+            0.2f + random.nextFloat() * 0.2f,
+            0.9f + random.nextFloat() * 0.15f,
+            false,
+        )
     }
 
-    public override fun randomTick(level: Level, pos: BlockPos, state: FluidState?, random: RandomSource?) {
-        if (level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
-            val i = random!!.nextInt(3)
-            if (i > 0) {
-                var blockpos = pos
+    // Copied from vanilla for lava fire spread
+    public override fun randomTick(level: Level, pos: BlockPos, state: FluidState, random: RandomSource) {
+        if (!level.gameRules.getBoolean(GameRules.RULE_DOFIRETICK)) {
+            return
+        }
 
-                for (j in 0..<i) {
-                    blockpos = blockpos.offset(random.nextInt(3) - 1, 1, random.nextInt(3) - 1)
-                    if (!level.isLoaded(blockpos)) {
-                        return
-                    }
+        val fireSpread = random.nextInt(3)
 
-                    val blockstate = level.getBlockState(blockpos)
-                    if (blockstate.isAir()) {
-                        if (this.hasFlammableNeighbours(level, blockpos)) {
-                            level.setBlockAndUpdate(
-                                blockpos,
-                                EventHooks.fireFluidPlaceBlockEvent(
-                                    level,
-                                    blockpos,
-                                    pos,
-                                    BaseFireBlock.getState(level, blockpos)
-                                )
-                            )
-                            return
-                        }
-                    } else if (blockstate.blocksMotion()) {
-                        return
-                    }
+        if (fireSpread > 0) {
+            var currentPos = pos
+
+            repeat(fireSpread) {
+                currentPos = currentPos.offset(random.nextInt(3) - 1, 1, random.nextInt(3) - 1)
+
+                if (!level.isLoaded(currentPos)) {
+                    return
                 }
-            } else {
-                for (k in 0..2) {
-                    val blockpos1 = pos.offset(random.nextInt(3) - 1, 0, random.nextInt(3) - 1)
-                    if (!level.isLoaded(blockpos1)) {
+
+                val neighborState = level.getBlockState(currentPos)
+
+                if (!neighborState.isAir) {
+                    if (neighborState.blocksMotion()) {
                         return
                     }
 
-                    if (level.isEmptyBlock(blockpos1.above()) && this.isFlammable(level, blockpos1, Direction.UP)) {
-                        level.setBlockAndUpdate(
-                            blockpos1.above(),
-                            EventHooks.fireFluidPlaceBlockEvent(
-                                level,
-                                blockpos1.above(),
-                                pos,
-                                BaseFireBlock.getState(level, blockpos1)
-                            )
+                    return@repeat
+                }
+
+                if (hasFlammableNeighbours(level, currentPos)) {
+                    level.setBlockAndUpdate(
+                        currentPos,
+                        EventHooks.fireFluidPlaceBlockEvent(
+                            level,
+                            currentPos,
+                            pos,
+                            BaseFireBlock.getState(level, currentPos),
                         )
-                    }
+                    )
+
+                    return
                 }
+            }
+        } else {
+            repeat(3) {
+                val randomNeighbor = pos.offset(random.nextInt(3) - 1, 0, random.nextInt(3) - 1)
+
+                if (!level.isLoaded(randomNeighbor)) {
+                    return
+                }
+
+                if (!level.isEmptyBlock(randomNeighbor.above()) || !this.isFlammable(level, randomNeighbor, Direction.UP)) {
+                    return@repeat
+                }
+
+                level.setBlockAndUpdate(
+                    randomNeighbor.above(),
+                    EventHooks.fireFluidPlaceBlockEvent(
+                        level,
+                        randomNeighbor.above(),
+                        pos,
+                        BaseFireBlock.getState(level, randomNeighbor),
+                    )
+                )
             }
         }
     }
 
-    private fun hasFlammableNeighbours(level: LevelReader, pos: BlockPos): Boolean {
-        for (direction in Direction.entries) {
-            if (this.isFlammable(level, pos.relative(direction), direction.getOpposite())) {
-                return true
-            }
-        }
-
-        return false
+    private fun hasFlammableNeighbours(level: LevelReader, pos: BlockPos) = Direction.entries.any {
+        isFlammable(level, pos.relative(it), it.opposite)
     }
 
     private fun isFlammable(level: LevelReader, pos: BlockPos, face: Direction): Boolean {
-        if (pos.getY() >= level.getMinBuildHeight() && pos.getY() < level.getMaxBuildHeight() && !level.hasChunkAt(pos)) {
+        if (pos.y >= level.minBuildHeight && pos.y < level.maxBuildHeight && !level.hasChunkAt(pos)) {
             return false
+        }
+
+        val state = level.getBlockState(pos)
+        return state.ignitedByLava() && state.isFlammable(level, pos, face)
+    }
+
+    override fun beforeDestroyingBlock(level: LevelAccessor, pos: BlockPos, state: BlockState) = fizz(level, pos)
+
+    public override fun getSlopeFindDistance(level: LevelReader): Int {
+        val slopeFindDistance = super.getSlopeFindDistance(level)
+
+        return if (level.dimensionType().ultraWarm()) {
+            slopeFindDistance * 3
         } else {
-            val state = level.getBlockState(pos)
-            return state.ignitedByLava() && state.isFlammable(level, pos, face)
+            slopeFindDistance
         }
     }
 
-    override fun beforeDestroyingBlock(level: LevelAccessor?, pos: BlockPos?, state: BlockState?) {
-        this.fizz(level!!, pos!!)
-    }
-
-    public override fun getSlopeFindDistance(level: LevelReader?): Int {
-        val slopeFindDistance = super.getSlopeFindDistance(level)
-
-        return if (level!!.dimensionType().ultraWarm()) slopeFindDistance * 3 else slopeFindDistance
-    }
-
-    public override fun getDropOff(level: LevelReader?): Int {
+    public override fun getDropOff(level: LevelReader): Int {
         val dropOff = super.getDropOff(level)
 
-        return if (level!!.dimensionType().ultraWarm()) dropOff / 2 else dropOff
+        return if (level.dimensionType().ultraWarm()) {
+            dropOff / 2
+        } else {
+            dropOff
+        }
     }
 
     public override fun canBeReplacedWith(
         fluidState: FluidState,
-        blockReader: BlockGetter?,
-        pos: BlockPos?,
-        fluid: Fluid?,
-        direction: Direction?
-    ): Boolean {
-        return fluidState.getHeight(blockReader, pos) >= LavaFluid.MIN_LEVEL_CUTOFF && fluid!!.`is`(FluidTags.WATER)
-    }
+        blockReader: BlockGetter,
+        pos: BlockPos,
+        fluid: Fluid,
+        direction: Direction,
+    ) = fluidState.getHeight(blockReader, pos) >= LavaFluid.MIN_LEVEL_CUTOFF && fluid.`is`(FluidTags.WATER)
 
-    override fun getTickDelay(level: LevelReader?): Int {
+    override fun getTickDelay(level: LevelReader): Int {
         val tickDelay = super.getTickDelay(level)
 
-        return if (level!!.dimensionType().ultraWarm()) tickDelay / 2 else tickDelay
+        return if (level.dimensionType().ultraWarm()) {
+            tickDelay / 2
+        } else {
+            tickDelay
+        }
     }
 
     public override fun getSpreadDelay(

@@ -1,6 +1,5 @@
 package net.msrandom.divinity.world.level.fluid
 
-import net.minecraft.core.Direction
 import net.minecraft.core.registries.Registries
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.item.BucketItem
@@ -9,7 +8,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LiquidBlock
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.material.FlowingFluid
 import net.minecraft.world.level.material.Fluid
 import net.minecraft.world.level.pathfinder.PathType
@@ -19,7 +17,6 @@ import net.msrandom.divinity.world.Registrar
 import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.level.block.DivinityBlocks
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
-import net.neoforged.neoforge.common.NeoForgeMod
 import net.neoforged.neoforge.common.SoundActions
 import net.neoforged.neoforge.fluids.BaseFlowingFluid
 import net.neoforged.neoforge.fluids.FluidInteractionRegistry
@@ -79,22 +76,7 @@ object DivinityFluids : Registrar<Fluid> {
             )
         }
 
-        val interaction = FluidInteractionRegistry.InteractionInformation(
-            { level, currentPos, relativePos, state ->
-                state.isSource && level.getFluidState(relativePos).fluidType == NeoForgeMod.WATER_TYPE.value()
-            },
-            { level, currentPos, relativePos, state ->
-                val block = solidForm()
-
-                if (BlockStateProperties.HORIZONTAL_FACING in block.stateDefinition.properties) {
-                    block.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.from2DDataValue(relativePos.asLong().toInt()))
-                } else {
-                    block.defaultBlockState()
-                }
-            },
-        )
-
-        interactionHandlers.add(fluidType to interaction)
+        interactionHandlers.add(fluidType to getMoltenFluidInteraction(solidForm))
 
         val fluid = object {
             val source: DeferredHolder<Fluid, MoltenFluid.Source> = register.register(name) { ->
