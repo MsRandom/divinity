@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.LevelWriter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.EntityBlock
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock
@@ -29,7 +30,7 @@ class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirection
         )
     }
 
-    override fun isRandomlyTicking(state: BlockState) = state.getValue(AGE) < MAX_AGE
+    override fun isRandomlyTicking(state: BlockState) = canGrow(state)
 
     override fun randomTick(state: BlockState, level: ServerLevel, pos: BlockPos, random: RandomSource) {
         if (!level.isAreaLoaded(pos, 1)) {
@@ -41,7 +42,7 @@ class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirection
         val speed = getGrowthSpeed(state, level, pos)
 
         if (random.nextInt((25.0F / speed).toInt() + 1) == 0) {
-            level.setBlock(pos, state.setValue(AGE, age + 1), 2)
+            grow(state, level, pos)
         }
     }
 
@@ -63,6 +64,14 @@ class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirection
     companion object {
         private val AGE: IntegerProperty = BlockStateProperties.AGE_5
         private const val MAX_AGE = 5
+
+        internal fun canGrow(state: BlockState) = state.getValue(AGE) < MAX_AGE
+
+        internal fun grow(state: BlockState, level: LevelWriter, pos: BlockPos) {
+            level.setBlock(pos, state.cycle(AGE), UPDATE_CLIENTS)
+
+            // TODO Send sound event
+        }
 
         // Mostly vanilla crop logic modified to use the right face directions & be less lenient
         private fun getGrowthSpeed(state: BlockState, level: LevelReader, pos: BlockPos): Float {
