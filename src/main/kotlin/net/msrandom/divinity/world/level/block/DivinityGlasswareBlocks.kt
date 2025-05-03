@@ -9,6 +9,7 @@ import net.msrandom.divinity.world.Registrar
 import net.msrandom.divinity.world.item.DivinityMoldItems
 import net.neoforged.neoforge.registries.DeferredRegister
 import kotlin.properties.PropertyDelegateProvider
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 object DivinityGlasswareBlocks : Registrar<DeferredRegister.Blocks> {
@@ -20,17 +21,17 @@ object DivinityGlasswareBlocks : Registrar<DeferredRegister.Blocks> {
     val gourd by mold()
     val spiral by mold()
 
-    class GlasswareBlockInfo(name: String) {
+    class GlasswareBlockInfo(name: String) : ReadOnlyProperty<Any?, GlasswareBlockInfo> {
         val glassware: Block by register.registerSimpleBlock(name)
         val mold: Item by DivinityMoldItems.register.registerSimpleItem("${name}_mold")
 
-        operator fun getValue(thisRef: Any?, property: KProperty<*>) = this
+        override operator fun getValue(thisRef: Any?, property: KProperty<*>) = this
     }
 
     private fun mold() = object : PropertyDelegateProvider<Any?, GlasswareBlockInfo> {
         override fun provideDelegate(
             thisRef: Any?,
             property: KProperty<*>,
-        ) = GlasswareBlockInfo(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, property.name))
+        ) = GlasswareBlockInfo(property.name)
     }
 }
