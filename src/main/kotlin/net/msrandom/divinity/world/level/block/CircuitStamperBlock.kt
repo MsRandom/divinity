@@ -83,12 +83,6 @@ class CircuitStamperBlock(properties: Properties) : HorizontalDirectionalBlock(p
         return level.getBlockEntity(pos)?.triggerEvent(id, param) == true
     }
 
-    override fun rotate(state: BlockState, rot: Rotation): BlockState =
-        state.setValue(FACING, rot.rotate(state.getValue(FACING)))
-
-    override fun mirror(state: BlockState, mirror: Mirror): BlockState =
-        state.setValue(FACING, mirror.mirror(state.getValue(FACING)))
-
     override fun codec(): MapCodec<CircuitStamperBlock> = simpleCodec(::CircuitStamperBlock)
     override fun newBlockEntity(pos: BlockPos, state: BlockState) = CircuitStamperBlockEntity(pos, state)
 

@@ -27,7 +27,7 @@ fun buildBlowMoldRecipes(recipeOutput: RecipeOutput) {
         recipeOutput.accept(
             ResourceLocation.fromNamespaceAndPath(key.namespace, "$recipeTypePath/${key.path}"),
             recipe,
-            null
+            null,
         )
     }
 

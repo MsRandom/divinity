@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.Block
 import net.msrandom.divinity.Divinity
 import net.msrandom.divinity.getValue
 import net.msrandom.divinity.world.Registrar
+import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.item.DivinityMoldItems
 import net.neoforged.neoforge.registries.DeferredRegister
 import kotlin.properties.PropertyDelegateProvider
@@ -24,6 +25,10 @@ object DivinityGlasswareBlocks : Registrar<DeferredRegister.Blocks> {
     class GlasswareBlockInfo(name: String) : ReadOnlyProperty<Any?, GlasswareBlockInfo> {
         val glassware: Block by register.registerSimpleBlock(name)
         val mold: Item by DivinityMoldItems.register.registerSimpleItem("${name}_mold")
+
+        init {
+            DivinityItems.register.registerSimpleBlockItem(name, ::glassware)
+        }
 
         override operator fun getValue(thisRef: Any?, property: KProperty<*>) = this
     }

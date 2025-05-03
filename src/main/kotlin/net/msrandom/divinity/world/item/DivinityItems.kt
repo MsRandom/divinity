@@ -50,6 +50,10 @@ object DivinityItems : Registrar<DeferredRegister.Items> {
                     for (holder in register.entries) {
                         output.accept(holder.get())
                     }
+
+                    for (holder in DivinityMoldItems.register.entries) {
+                        output.accept(holder.get())
+                    }
                 }.build()
         }
     }
