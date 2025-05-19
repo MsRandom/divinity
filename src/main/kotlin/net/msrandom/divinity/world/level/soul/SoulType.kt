@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.entity.EntityType
 import net.msrandom.divinity.Divinity
+import net.msrandom.divinity.world.level.soul.SoulType.entries
 import net.neoforged.neoforge.registries.datamaps.DataMapType
 
 enum class SoulType : StringRepresentable {
