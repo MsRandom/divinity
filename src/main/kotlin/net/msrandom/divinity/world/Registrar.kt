@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty0
 sealed interface BaseRegistrar<T, R : DeferredRegister<T>> {
     val register: R
 
-    fun <U : T> holder(property: KProperty0<R>): DeferredHolder<T, U> {
+    fun <U : T> holder(property: KProperty0<U>): DeferredHolder<T, U> {
         @Suppress("UNCHECKED_CAST")
         return property.getDelegate() as DeferredHolder<T, U>
     }
