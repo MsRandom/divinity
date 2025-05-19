@@ -9,18 +9,14 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.material.FlowingFluid
 import net.minecraft.world.level.material.MapColor
 import net.minecraft.world.level.material.PushReaction
-import net.msrandom.divinity.Divinity
 import net.msrandom.divinity.getValue
-import net.msrandom.divinity.world.Registrar
+import net.msrandom.divinity.world.BlockRegistrar
 import net.msrandom.divinity.world.item.BlueCrystalItem
 import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.level.fluid.DivinityFluids
 import net.neoforged.neoforge.registries.DeferredBlock
-import net.neoforged.neoforge.registries.DeferredRegister
 
-object DivinityBlocks : Registrar<DeferredRegister.Blocks> {
-    override val register: DeferredRegister.Blocks = DeferredRegister.createBlocks(Divinity.MOD_ID)
-
+object DivinityBlocks : BlockRegistrar() {
     val blueCrystal: BlueCrystalBlock by blockWithItem("blue_crystal", ::BlueCrystalBlock, itemFactory = ::BlueCrystalItem)
 
     val circuitStamper: CircuitStamperBlock by blockWithItem("circuit_stamper", ::CircuitStamperBlock)

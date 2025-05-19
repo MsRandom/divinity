@@ -7,22 +7,20 @@ import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.Item
 import net.msrandom.divinity.Divinity
 import net.msrandom.divinity.getValue
-import net.msrandom.divinity.world.Registrar
+import net.msrandom.divinity.world.ItemRegistrar
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.reflect.KProperty
 
-internal fun Registrar<DeferredRegister.Items>.simpleItem() = object : PropertyDelegateProvider<Any?, DeferredItem<Item>> {
+internal fun ItemRegistrar.simpleItem() = object : PropertyDelegateProvider<Any?, DeferredItem<Item>> {
     override fun provideDelegate(
         thisRef: Any?,
         property: KProperty<*>,
     ) = register.registerSimpleItem(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, property.name))
 }
 
-object DivinityItems : Registrar<DeferredRegister.Items> {
-    override val register: DeferredRegister.Items = DeferredRegister.createItems(Divinity.MOD_ID)
-
+object DivinityItems : ItemRegistrar() {
     val tabRegister: DeferredRegister<CreativeModeTab> =
         DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Divinity.MOD_ID)
 

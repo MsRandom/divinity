@@ -25,10 +25,7 @@ import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.NeoForgeRegistries
 
-object DivinityFluids : Registrar<DeferredRegister<Fluid>> {
-    override val register: DeferredRegister<Fluid> =
-        DeferredRegister.create(Registries.FLUID, Divinity.MOD_ID)
-
+object DivinityFluids : Registrar<Fluid>(Registries.FLUID) {
     val fluidTypeRegister: DeferredRegister<FluidType> =
         DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, Divinity.MOD_ID)
 

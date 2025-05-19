@@ -49,3 +49,7 @@ cloche {
         parchment("2024.11.17")
     }
 }
+
+dependencies {
+    implementation(kotlin("reflect"))
+}

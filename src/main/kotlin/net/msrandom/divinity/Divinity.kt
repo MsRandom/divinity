@@ -1,6 +1,6 @@
 package net.msrandom.divinity
 
-import net.msrandom.divinity.world.Registrar
+import net.msrandom.divinity.world.BaseRegistrar
 import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.item.DivinityMoldItems
 import net.msrandom.divinity.world.item.crafting.DivinityRecipeSerializers
@@ -17,6 +17,7 @@ import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent
 
 @Mod(Divinity.MOD_ID)
@@ -36,7 +37,7 @@ class Divinity(modBus: IEventBus) {
             DivinityFluids,
             DivinityRecipeTypes,
             DivinityRecipeSerializers,
-        ).map(Registrar<*>::register) + extraRegisters
+        ).map(BaseRegistrar<*, *>::register) + extraRegisters
 
         for (register in registers) {
             register.register(modBus)

@@ -8,11 +8,8 @@ import net.msrandom.divinity.Divinity
 import net.msrandom.divinity.getValue
 import net.msrandom.divinity.world.Registrar
 import net.neoforged.neoforge.registries.DeferredHolder
-import net.neoforged.neoforge.registries.DeferredRegister
 
-object DivinityRecipeTypes : Registrar< DeferredRegister<RecipeType<*>>> {
-    override val register: DeferredRegister<RecipeType<*>> = DeferredRegister.create(Registries.RECIPE_TYPE, Divinity.MOD_ID)
-
+object DivinityRecipeTypes : Registrar<RecipeType<*>>(Registries.RECIPE_TYPE) {
     val circuitStamper by recipeType<CircuitStamperRecipe>("circuit_stamper")
     val blowMold by recipeType<BlowMoldRecipe>("blow_mold")
 
