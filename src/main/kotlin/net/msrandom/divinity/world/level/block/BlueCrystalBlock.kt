@@ -38,7 +38,6 @@ class BlueCrystalBlock(properties: Properties) : FaceAttachedHorizontalDirection
         }
 
         // It is assumed that this block is not maximum age as otherwise it would not have randomly ticked
-        val age = state.getValue(AGE)
         val speed = getGrowthSpeed(state, level, pos)
 
         if (random.nextInt((25.0F / speed).toInt() + 1) == 0) {

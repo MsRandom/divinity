@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.EntityBlock
 import net.minecraft.world.level.block.HorizontalDirectionalBlock
 import net.minecraft.world.level.block.RenderShape
+import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
@@ -18,6 +19,10 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.msrandom.divinity.world.level.block.entity.CircuitStamperBlockEntity
 import net.msrandom.divinity.world.level.block.entity.DivinityBlockEntities
 
+/**
+ * We intentionally do not override [BlockBehaviour.onExplosionHit] to handle wind charges,
+ *   as this block requires too much force for a player to open with a wind charge or with hand
+ */
 class CircuitStamperBlock(properties: Properties) : HorizontalDirectionalBlock(properties), EntityBlock {
     init {
         registerDefaultState(stateDefinition.any().setValue(POWERED, false).setValue(FACING, Direction.NORTH))

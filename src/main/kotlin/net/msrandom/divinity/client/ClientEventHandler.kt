@@ -2,14 +2,18 @@
 
 package net.msrandom.divinity.client
 
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.material.Fluid
 import net.msrandom.divinity.Divinity
+import net.msrandom.divinity.client.renderer.blockentity.BellowsRenderer
+import net.msrandom.divinity.world.level.block.entity.DivinityBlockEntities
 import net.msrandom.divinity.world.level.fluid.DivinityFluids
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 
@@ -33,4 +37,9 @@ fun registerClientExtensions(event: RegisterClientExtensionsEvent) {
     registerFluidTextures(DivinityFluids.moltenBlueCrystal)
     registerFluidTextures(DivinityFluids.moltenYellowCrystal)
     registerFluidTextures(DivinityFluids.moltenGlass)
+}
+
+@SubscribeEvent
+fun clientSetup(event: FMLClientSetupEvent) {
+    BlockEntityRenderers.register(DivinityBlockEntities.bellows, ::BellowsRenderer)
 }
