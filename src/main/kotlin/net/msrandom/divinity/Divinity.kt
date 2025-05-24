@@ -45,6 +45,7 @@ class Divinity(modBus: IEventBus) {
 
         modBus.addListener(::registerDataMapTypes)
         modBus.addListener(DivinityFluids::registerFluidInteractions)
+        modBus.addListener(DivinityBlockEntities::registerCapabilities)
 
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, SoulEventHandler::dropSoulBone)
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, MeltEventHandler::checkEntityInvulnerability)

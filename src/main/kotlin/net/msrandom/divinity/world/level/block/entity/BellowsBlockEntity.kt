@@ -28,9 +28,9 @@ class BellowsBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(Divinit
     internal var isBeingPushed = false
 
     fun addProgress(progress: Int) {
-        totalProgress += progress
+        totalProgress = (totalProgress + progress).coerceAtMost(MAX_TICK_PROGRESS)
 
-        if (totalProgress >= MAX_TICK_PROGRESS) {
+        if (!triggered && totalProgress >= MAX_TICK_PROGRESS) {
             val pos = blockPos.relative(blockState.getValue(HorizontalDirectionalBlock.FACING))
 
             markFinished()
@@ -39,18 +39,16 @@ class BellowsBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(Divinit
     }
 
     fun removeProgress(progress: Int) {
-        totalProgress = max(totalProgress - progress, 0)
+        totalProgress = (totalProgress - progress).coerceAtLeast(0)
+
+        if (totalProgress == 0) {
+            // Require winding up before triggering again
+            // TODO The original mod might've just required 2 ticks of cooldown, double check to ensure consistency
+            triggered = false
+        }
     }
 
     private fun activate(pos: BlockPos) {
-        if (!level!!.isClientSide) {
-            level!!.server!!.logChatMessage(
-                Component.literal("Pushed"), ChatType.Bound(
-                    level!!.registryAccess().registryOrThrow(Registries.CHAT_TYPE).getHolder(ChatType.CHAT).get(),
-                    Component.literal("Bellow"), Optional.empty()
-                ), null
-            )
-        }
         DivinityBlockEntities.blowMold.getBlockEntity(level!!, pos)?.craft()
     }
 

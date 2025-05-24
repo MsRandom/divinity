@@ -1,10 +1,8 @@
-package net.msrandom.divinity.data
+package net.msrandom.divinity.data.recipe
 
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.RecipeOutput
-import net.minecraft.data.recipes.RecipeProvider
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -13,7 +11,6 @@ import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.item.crafting.CircuitStamperRecipe
 import net.msrandom.divinity.world.item.crafting.DivinityRecipeSerializers
 import net.msrandom.divinity.world.level.block.DivinityBlocks
-import java.util.concurrent.CompletableFuture
 
 fun buildCircuitStamperRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
     val recipeTypePath = BuiltInRegistries.RECIPE_SERIALIZER.getKey(DivinityRecipeSerializers.circuitStamper)!!.path

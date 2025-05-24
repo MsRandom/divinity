@@ -1,4 +1,4 @@
-package net.msrandom.divinity.data
+package net.msrandom.divinity.data.recipe
 
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.recipes.RecipeOutput
@@ -13,6 +13,7 @@ import net.msrandom.divinity.world.item.DivinityItems
 import net.msrandom.divinity.world.item.DivinityMoldItems
 import net.msrandom.divinity.world.item.crafting.BlowMoldRecipe
 import net.msrandom.divinity.world.item.crafting.DivinityRecipeSerializers
+import net.msrandom.divinity.world.level.block.DivinityBlocks
 import net.msrandom.divinity.world.level.block.DivinityGlasswareBlocks
 import net.msrandom.divinity.world.level.fluid.DivinityFluids
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient
@@ -45,4 +46,5 @@ fun buildBlowMoldRecipes(recipeOutput: RecipeOutput) {
 
     add(DivinityMoldItems.bottleMold, DivinityFluids.moltenGlass, ItemStack(Items.GLASS_BOTTLE, 6))
     add(DivinityMoldItems.paneMold, DivinityFluids.moltenGlass, ItemStack(Blocks.GLASS_PANE, 5))
+    add(DivinityMoldItems.inletMold, DivinityFluids.moltenGlass, ItemStack(DivinityBlocks.bareLiquidInlet))
 }

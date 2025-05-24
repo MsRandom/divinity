@@ -10,11 +10,15 @@ import net.msrandom.divinity.Divinity
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.isAccessible
 
 sealed interface BaseRegistrar<T, R : DeferredRegister<T>> {
     val register: R
 
+    // TODO Instead of reflection, just store a property -> holder mapping via provideDelegate
     fun <U : T> holder(property: KProperty0<U>): DeferredHolder<T, U> {
+        property.isAccessible = true
+
         @Suppress("UNCHECKED_CAST")
         return property.getDelegate() as DeferredHolder<T, U>
     }

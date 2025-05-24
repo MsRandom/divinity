@@ -92,13 +92,17 @@ class BellowsBlock(properties: Properties) : HorizontalDirectionalBlock(properti
         entity.isBeingPushed = true
         entity.setChanged()
 
-        level.scheduleTick(pos, this, USAGE_TICK_MAX_INTERVAL + 1)
+        if (!level.isClientSide) {
+            level.scheduleTick(pos, this, USAGE_TICK_MAX_INTERVAL + 1)
+        }
 
         return if (delay > USAGE_TICK_MAX_INTERVAL) {
-            entity.addProgress(1)
+            // Swing
             InteractionResult.SUCCESS_NO_ITEM_USED
         } else {
             entity.addProgress(delay.toInt())
+
+            // No swing
             InteractionResult.FAIL
         }
     }

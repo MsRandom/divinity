@@ -2,6 +2,7 @@ package net.msrandom.divinity.world.level.block
 
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.LiquidBlock
 import net.minecraft.world.level.block.SoundType
@@ -22,6 +23,14 @@ object DivinityBlocks : BlockRegistrar() {
     val circuitStamper: CircuitStamperBlock by blockWithItem("circuit_stamper", ::CircuitStamperBlock)
     val bellows: BellowsBlock by blockWithItem("bellows", ::BellowsBlock)
     val blowMold: BlowMoldBlock by blockWithItem("blow_mold", ::BlowMoldBlock)
+
+    val bareLiquidInlet: LiquidInletBlock by blockWithItem("bare_liquid_inlet", {
+        LiquidInletBlock(Items.GLASS.builtInRegistryHolder(), false, it)
+    })
+
+    val cooledLiquidInlet: LiquidInletBlock by blockWithItem("cooled_liquid_inlet", {
+        LiquidInletBlock(Items.GLASS.builtInRegistryHolder(), true, it)
+    })
 
     val moltenBlueCrystal: LiquidBlock by moltenFluidBlock("molten_blue_crystal", DivinityFluids::moltenBlueCrystal)
     val moltenYellowCrystal: LiquidBlock by moltenFluidBlock("molten_yellow_crystal", DivinityFluids::moltenYellowCrystal)

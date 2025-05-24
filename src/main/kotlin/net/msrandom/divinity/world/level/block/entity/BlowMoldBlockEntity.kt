@@ -16,18 +16,15 @@ import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank
 
-class BlowMoldBlockEntity private constructor(
+class BlowMoldBlockEntity(
     pos: BlockPos,
     state: BlockState,
-    private val tank: FluidTank = FluidTank(FluidType.BUCKET_VOLUME),
 ) :
     BlockEntity(DivinityBlockEntities.blowMold, pos, state),
     RecipeInput,
-    Container,
-    IFluidHandler by tank {
+    Container {
+    internal val tank: FluidTank = FluidTank(FluidType.BUCKET_VOLUME)
     private val items = NonNullList.withSize(2, ItemStack.EMPTY)
-
-    constructor(pos: BlockPos, state: BlockState): this(pos, state, FluidTank(FluidType.BUCKET_VOLUME))
 
     override fun getContainerSize() = items.size
     override fun isEmpty() = items.all(ItemStack::isEmpty)
@@ -74,7 +71,7 @@ class BlowMoldBlockEntity private constructor(
 
         setItem(OUTPUT_SLOT, result)
 
-        drain(getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE)
+        tank.drain(tank.fluidAmount, IFluidHandler.FluidAction.EXECUTE)
     }
 
     companion object {

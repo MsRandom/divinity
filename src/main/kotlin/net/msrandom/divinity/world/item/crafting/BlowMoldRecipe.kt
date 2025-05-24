@@ -21,8 +21,7 @@ class BlowMoldRecipe(
     override fun matches(
         input: BlowMoldBlockEntity,
         level: Level,
-    ) = moldIngredient.test(input.getItem(BlowMoldBlockEntity.MOLD_SLOT)) &&
-            fluidIngredient.test(input.getFluidInTank(0))
+    ) = moldIngredient.test(input.getItem(BlowMoldBlockEntity.MOLD_SLOT)) && fluidIngredient.test(input.tank.fluid)
 
     override fun assemble(input: BlowMoldBlockEntity, registries: HolderLookup.Provider): ItemStack = result.copy()
     override fun canCraftInDimensions(width: Int, height: Int) = true
