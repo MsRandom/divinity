@@ -14,14 +14,17 @@ import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.BaseEntityBlock
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.EntityBlock
-import net.minecraft.world.level.block.HorizontalDirectionalBlock
 import net.minecraft.world.level.block.LevelEvent
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
 import net.msrandom.divinity.world.level.block.entity.DivinityBlockEntities
 import net.msrandom.divinity.world.level.block.entity.LiquidInletBlockEntity
@@ -35,11 +38,17 @@ class LiquidInletBlock(
     val material: Holder<Item>,
     val cooled: Boolean,
     properties: Properties,
-) : HorizontalDirectionalBlock(properties), EntityBlock {
+) : BaseEntityBlock(properties) {
     // TODO Analog signal?
 
     init {
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH))
+        registerDefaultState(
+            stateDefinition.any()
+                .setValue(NORTH, false)
+                .setValue(SOUTH, false)
+                .setValue(WEST, false)
+                .setValue(EAST, false)
+        )
     }
 
     private fun maybeScheduleMelt(level: LevelAccessor, pos: BlockPos, entity: LiquidInletBlockEntity) {
@@ -54,6 +63,38 @@ class LiquidInletBlock(
         level.scheduleTick(pos, this, meltTime)
     }
 
+    private fun connections(level: LevelReader, pos: BlockPos) =
+        Direction.Plane.HORIZONTAL.asSequence().filter {
+            level.getBlockState(pos.relative(it)).block === DivinityBlocks.blowMold
+        }
+
+    override fun canSurvive(state: BlockState, level: LevelReader, pos: BlockPos) = connections(level, pos).any()
+
+    private fun getUpdatedState(level: LevelReader, pos: BlockPos): BlockState? {
+        var state: BlockState? = null
+
+        fun toggleDirection(property: BooleanProperty) {
+            val base = state ?: defaultBlockState()
+
+            state = base.setValue(property, true)
+        }
+
+        for (direction in connections(level, pos)) {
+            when (direction) {
+                Direction.NORTH -> toggleDirection(NORTH)
+                Direction.SOUTH -> toggleDirection(SOUTH)
+                Direction.WEST -> toggleDirection(WEST)
+                Direction.EAST -> toggleDirection(EAST)
+                else -> {}
+            }
+        }
+
+        return state
+    }
+
+    override fun getStateForPlacement(context: BlockPlaceContext) =
+        getUpdatedState(context.level, context.clickedPos)
+
     override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
@@ -61,7 +102,7 @@ class LiquidInletBlock(
         pos: BlockPos,
         player: Player,
         hand: InteractionHand,
-        hitResult: BlockHitResult
+        hitResult: BlockHitResult,
     ): ItemInteractionResult {
         fun passthrough() = super.useItemOn(
             stack,
@@ -80,10 +121,67 @@ class LiquidInletBlock(
                 maybeScheduleMelt(level, pos, entity)
             }
 
+            level.updateNeighbourForOutputSignal(pos, this)
+
             return ItemInteractionResult.sidedSuccess(level.isClientSide)
         }
 
         return passthrough()
+    }
+
+    override fun neighborChanged(
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        neighborBlock: Block,
+        neighborPos: BlockPos,
+        movedByPiston: Boolean,
+    ) {
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston)
+
+        fun handleDirection(direction: Direction, property: BooleanProperty): Boolean {
+            if (neighborPos == pos.relative(direction)) {
+                val isBlowMold = level.getBlockState(neighborPos).block === DivinityBlocks.blowMold
+                val isToggled = state.getValue(property)
+
+                if (isBlowMold != isToggled) {
+                    val keepPlaced = if (isBlowMold) {
+                        true
+                    } else {
+                        listOf(NORTH, SOUTH, WEST, EAST)
+                            .filterNot(property::equals)
+                            .map(state::getValue)
+                            .any { it }
+                    }
+
+                    if (keepPlaced) {
+                        level.setBlockAndUpdate(pos, state.setValue(property, isBlowMold))
+                    } else {
+                        level.removeBlock(pos, false)
+
+                        dropResources(state, level, pos)
+                    }
+                }
+
+                return true
+            }
+
+            return false
+        }
+
+        if (handleDirection(Direction.NORTH, NORTH)) {
+            return
+        }
+
+        if (handleDirection(Direction.SOUTH, SOUTH)) {
+            return
+        }
+
+        if (handleDirection(Direction.WEST, WEST)) {
+            return
+        }
+
+        handleDirection(Direction.EAST, EAST)
     }
 
     override fun tick(state: BlockState, level: ServerLevel, pos: BlockPos, random: RandomSource) {
@@ -104,7 +202,7 @@ class LiquidInletBlock(
         val fluidState = fluidType.getStateForPlacement(level, pos, stack)
         val fluidBlockState = fluidType.getBlockForFluidState(level, pos, fluidState)
 
-        level.setBlock(pos, fluidBlockState, UPDATE_ALL)
+        level.setBlockAndUpdate(pos, fluidBlockState)
 
         level.levelEvent(LevelEvent.LAVA_FIZZ, pos, 0)
     }
@@ -116,14 +214,8 @@ class LiquidInletBlock(
         state: BlockState,
     ) = LiquidInletBlockEntity(pos, state)
 
-    override fun triggerEvent(state: BlockState, level: Level, pos: BlockPos, id: Int, param: Int): Boolean {
-        super.triggerEvent(state, level, pos, id, param)
-
-        return level.getBlockEntity(pos)?.triggerEvent(id, param) == true
-    }
-
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
-        builder.add(FACING)
+        builder.add(NORTH, SOUTH, WEST, EAST)
     }
 
     companion object {
@@ -135,5 +227,10 @@ class LiquidInletBlock(
                 propertiesCodec(),
             ).apply(it, ::LiquidInletBlock)
         }
+
+        private val NORTH = BlockStateProperties.NORTH
+        private val SOUTH = BlockStateProperties.SOUTH
+        private val WEST = BlockStateProperties.WEST
+        private val EAST = BlockStateProperties.EAST
     }
 }

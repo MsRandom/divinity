@@ -1,6 +1,7 @@
 package net.msrandom.divinity.world.level.block.entity
 
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
@@ -25,6 +26,15 @@ class BlowMoldBlockEntity(
     Container {
     internal val tank: FluidTank = FluidTank(FluidType.BUCKET_VOLUME)
     private val items = NonNullList.withSize(2, ItemStack.EMPTY)
+
+    private var hottestIntakeDirection: Direction? = null
+
+    internal val hottestIntakeFluid
+        get() = hottestIntakeDirection?.let { direction ->
+            val pos = blockPos.relative(direction)
+
+            DivinityBlockEntities.liquidInlet.getBlockEntity(level!!, pos)?.tank?.fluid?.fluidType
+        }
 
     override fun getContainerSize() = items.size
     override fun isEmpty() = items.all(ItemStack::isEmpty)
@@ -72,6 +82,10 @@ class BlowMoldBlockEntity(
         setItem(OUTPUT_SLOT, result)
 
         tank.drain(tank.fluidAmount, IFluidHandler.FluidAction.EXECUTE)
+    }
+
+    fun attachIntake(direction: Direction?) {
+        hottestIntakeDirection = direction
     }
 
     companion object {

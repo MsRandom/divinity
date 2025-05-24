@@ -10,7 +10,8 @@ import net.msrandom.divinity.Divinity
 import net.neoforged.neoforge.registries.datamaps.DataMapType
 
 object MeltingData {
-    const val MELTING_TICK_FACTOR = 10 + 6 * TICKS_PER_SECOND
+    const val MELTING_TICK_FACTOR = 6 * TICKS_PER_SECOND + 10
+    const val INDIRECT_MELTING_TICK_FACTOR = 10 * TICKS_PER_SECOND
 
     @JvmField
     val DATA_MAP: DataMapType<Item, Fluid> = DataMapType.builder(
