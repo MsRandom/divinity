@@ -38,6 +38,7 @@ object DivinityItems : ItemRegistrar() {
     val emitter: Item by simpleItem()
     val quantifier: Item by simpleItem()
     val ponderanceLattice: Item by simpleItem()
+    val crystallizedSoulbone: Item by simpleItem()
 
     init {
         tabRegister.register("main") { ->

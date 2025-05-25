@@ -4,6 +4,8 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.IronBarsBlock
 import net.minecraft.world.level.block.LiquidBlock
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
@@ -32,11 +34,18 @@ object DivinityBlocks : BlockRegistrar() {
         LiquidInletBlock(Items.GLASS.builtInRegistryHolder(), true, it)
     })
 
+    val crystallizedSoulbonePane: IronBarsBlock by blockWithItem(
+        "crystallized_soulbone_pane",
+        ::IronBarsBlock,
+        BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS_PANE),
+    )
+
     val moltenBlueCrystal: LiquidBlock by moltenFluidBlock("molten_blue_crystal", DivinityFluids::moltenBlueCrystal)
     val moltenYellowCrystal: LiquidBlock by moltenFluidBlock("molten_yellow_crystal", DivinityFluids::moltenYellowCrystal)
     val moltenGlass: LiquidBlock by moltenFluidBlock("molten_glass", DivinityFluids::moltenGlass)
+    val moltenCrystallizedSoulbone: LiquidBlock by moltenFluidBlock("molten_crystallized_soulbone", DivinityFluids::moltenCrystallizedSoulbone, lightLevel = 12)
 
-    private fun moltenFluidBlock(name: String, fluid: () -> FlowingFluid): DeferredBlock<LiquidBlock> {
+    private fun moltenFluidBlock(name: String, fluid: () -> FlowingFluid, lightLevel: Int = 10): DeferredBlock<LiquidBlock> {
         return register.registerBlock(name) {
             LiquidBlock(
                 fluid(),
@@ -46,7 +55,7 @@ object DivinityBlocks : BlockRegistrar() {
                     .noCollission()
                     .randomTicks()
                     .strength(100.0F)
-                    .lightLevel { 15 }
+                    .lightLevel { lightLevel }
                     .pushReaction(PushReaction.DESTROY)
                     .noLootTable()
                     .liquid()

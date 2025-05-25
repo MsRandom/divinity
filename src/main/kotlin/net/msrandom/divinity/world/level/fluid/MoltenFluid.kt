@@ -150,7 +150,7 @@ abstract class MoltenFluid protected constructor(properties: Properties) : BaseF
         val slopeFindDistance = super.getSlopeFindDistance(level)
 
         return if (level.dimensionType().ultraWarm()) {
-            slopeFindDistance * 3
+            slopeFindDistance * 2
         } else {
             slopeFindDistance
         }

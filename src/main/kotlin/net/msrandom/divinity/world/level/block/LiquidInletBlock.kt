@@ -40,6 +40,7 @@ class LiquidInletBlock(
     properties: Properties,
 ) : BaseEntityBlock(properties) {
     // TODO Analog signal?
+    // TODO Implement updateShape?
 
     init {
         registerDefaultState(

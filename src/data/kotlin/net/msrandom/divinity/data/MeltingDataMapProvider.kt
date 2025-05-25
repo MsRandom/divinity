@@ -21,6 +21,7 @@ class MeltingDataMapProvider(
 
         meltingData.add(DivinityBlocks.holder(DivinityBlocks::blueCrystal).id, DivinityFluids.moltenBlueCrystal, false)
         meltingData.add(DivinityItems.holder(DivinityItems::yellowCrystal), DivinityFluids.moltenYellowCrystal, false)
+        meltingData.add(DivinityItems.holder(DivinityItems::crystallizedSoulbone), DivinityFluids.moltenCrystallizedSoulbone, false)
 
         // Every glass block melts into the same fluid, the dye is burnt off
         meltingData

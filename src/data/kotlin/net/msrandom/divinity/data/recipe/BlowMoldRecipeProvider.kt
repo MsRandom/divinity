@@ -44,7 +44,9 @@ fun buildBlowMoldRecipes(recipeOutput: RecipeOutput) {
     add(DivinityMoldItems.gemMold, DivinityFluids.moltenBlueCrystal, ItemStack(DivinityItems.blueGem, 3))
     add(DivinityMoldItems.gemMold, DivinityFluids.moltenYellowCrystal, ItemStack(DivinityItems.yellowCrystal, 3))
 
-    add(DivinityMoldItems.bottleMold, DivinityFluids.moltenGlass, ItemStack(Items.GLASS_BOTTLE, 6))
+    add(DivinityMoldItems.paneMold, DivinityFluids.moltenCrystallizedSoulbone, ItemStack(DivinityBlocks.crystallizedSoulbonePane))
+
     add(DivinityMoldItems.paneMold, DivinityFluids.moltenGlass, ItemStack(Blocks.GLASS_PANE, 5))
+    add(DivinityMoldItems.bottleMold, DivinityFluids.moltenGlass, ItemStack(Items.GLASS_BOTTLE, 6))
     add(DivinityMoldItems.inletMold, DivinityFluids.moltenGlass, ItemStack(DivinityBlocks.bareLiquidInlet))
 }

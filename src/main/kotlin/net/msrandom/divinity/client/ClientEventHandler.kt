@@ -37,6 +37,7 @@ fun registerClientExtensions(event: RegisterClientExtensionsEvent) {
     registerFluidTextures(DivinityFluids.moltenBlueCrystal)
     registerFluidTextures(DivinityFluids.moltenYellowCrystal)
     registerFluidTextures(DivinityFluids.moltenGlass)
+    registerFluidTextures(DivinityFluids.moltenCrystallizedSoulbone)
 }
 
 @SubscribeEvent

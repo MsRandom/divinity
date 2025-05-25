@@ -37,11 +37,24 @@ object DivinityFluids : Registrar<Fluid>(Registries.FLUID) {
         DivinityBlocks::moltenBlueCrystal,
         DivinityBlocks::blueCrystal
     )
+
     val moltenYellowCrystal: FlowingFluid by register(
         "molten_yellow_crystal",
         DivinityBlocks::moltenYellowCrystal,
         DivinityBlocks::blueCrystal
     )
+
+    val moltenCrystallizedSoulbone: FlowingFluid by register(
+        "molten_crystallized_soulbone",
+        DivinityBlocks::moltenCrystallizedSoulbone,
+        null,
+
+        lightLevel = 12,
+        temperature = 1200,
+        tickRate = 35,
+        slopeFindDistance = 2,
+    )
+
     val moltenGlass: FlowingFluid by register("molten_glass", DivinityBlocks::moltenGlass, Blocks::GLASS)
 
     internal fun registerFluidInteractions(@Suppress("unused") event: FMLCommonSetupEvent) {
@@ -53,7 +66,11 @@ object DivinityFluids : Registrar<Fluid>(Registries.FLUID) {
     private fun register(
         name: String,
         liquidBlock: () -> LiquidBlock,
-        solidForm: () -> Block,
+        solidForm: (() -> Block)?,
+        lightLevel: Int = 10,
+        temperature: Int = 1000,
+        tickRate: Int = 40,
+        slopeFindDistance: Int = 1,
     ): DeferredHolder<Fluid, MoltenFluid.Source> {
         val fluidType = fluidTypeRegister.register(name) { ->
             FluidType(
@@ -66,14 +83,16 @@ object DivinityFluids : Registrar<Fluid>(Registries.FLUID) {
                     .adjacentPathType(null)
                     .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA) // TODO Should be custom sound events
                     .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
-                    .lightLevel(10)
+                    .lightLevel(lightLevel)
                     .density(3000)
                     .viscosity(6000)
-                    .temperature(1000)
+                    .temperature(temperature)
             )
         }
 
-        interactionHandlers.add(fluidType to getMoltenFluidInteraction(solidForm))
+        if (solidForm != null) {
+            interactionHandlers.add(fluidType to getMoltenFluidInteraction(solidForm))
+        }
 
         val fluid = object {
             val source: DeferredHolder<Fluid, MoltenFluid.Source> = register.register(name) { ->
@@ -92,8 +111,8 @@ object DivinityFluids : Registrar<Fluid>(Registries.FLUID) {
                 .block(liquidBlock)
                 .bucket(bucket)
                 .explosionResistance(100f)
-                .tickRate(40)
-                .slopeFindDistance(1)
+                .tickRate(tickRate)
+                .slopeFindDistance(slopeFindDistance)
                 .levelDecreasePerBlock(2)
         }.source
 
